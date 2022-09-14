@@ -5,7 +5,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.Collections;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,24 +12,13 @@ import java.util.Collections;
 @Setter
 @ToString
 @Entity
-@Table(name="posts")
-public class Post {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Table(name="catgories")
+
+public class Category {
+@Id
+@GeneratedValue(Strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, length = 100)
-    private String title;
-
-    @Column(nullable = false, length = 100)
-    private String content;
-
-
-    @ManyToOne
-    @JsonIgnoreProperties({"posts", "password"})
-//    ----------------------------------------------------------------------------------------------------------
-    private User author;
-
+    private  String name;
     @ManyToMany(
             fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.REFRESH},
@@ -44,4 +32,8 @@ public class Post {
     )
     @JsonIgnoreProperties("posts")
     private Collection<Category> categories;
+
+
+    private Collection<Post> posts;
+
 }

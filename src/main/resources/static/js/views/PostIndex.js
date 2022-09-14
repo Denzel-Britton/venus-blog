@@ -39,15 +39,33 @@ function generatePostsHTML(posts) {
         <tr>
             <th scope="col">Title</th>
             <th scope="col">Content</th>
+            <th scope="col">Categories</th>
+            <th scope="col">Author</th>
         </tr>
         </thead>
         <tbody>
     `;
     for (let i = 0; i < posts.length; i++) {
         const post = posts[i];
+
+        let categories = '';
+        if(post.categories) {
+            for (let j = 0; j < post.categories.length; j++) {
+                if (categories !== "") {
+                    categories += ", ";
+                }
+                categories += post.categories[j].name;
+            }
+        }
+        let authorName = "";
+        if(post.author) {
+            authorName = post.author.name;
+        }
         postsHTML += `<tr>
             <td>${post.title}</td>
             <td>${post.content}</td>
+            <td>${categories}</td>
+            <td>${authorName}</td>
             <td><button data-id=${post.id} class="button btn-primary editPost">Edit</button></td>
             <td><button data-id=${post.id} class="button btn-danger deletePost">Delete</button></td>
             </tr>`;
@@ -134,10 +152,14 @@ function deletePost(postId) {
         method: "DELETE",
         headers: {"Content-Type": "application/json"},
     }
-    const url = "http://localhost:8081/api/posts/" + postId;
+    const url = POST_API_BASE_URL + `/${postId}`;
     fetch(url, request)
         .then(function(response) {
-            // TODO: check the response code
+            if(response.status !== 200) {
+                console.log("fetch returned bad status code: " + response.status);
+                console.log(response.statusText);
+                return;
+            }
             CreateView("/posts");
         })
 }
@@ -151,40 +173,43 @@ function deletePost(postId) {
 function setupSaveHandler() {
     const saveButton = document.querySelector("#savePost");
     saveButton.addEventListener("click", function(event) {
-
-        // TODO: refactor later to a separate function for hygiene
-
-        // TODO: check the data-id for the save button
         const postId = parseInt(this.getAttribute("data-id"));
-
-        // get the title and content for the new/updated post
-        const titleField = document.querySelector("#title");
-        const contentField = document.querySelector("#content");
-
-        // make the new/updated post object
-        const post = {
-            title: titleField.value,
-            content: contentField.value
-        }
-
-        // make the request
-        const request = {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(post)
-        }
-        let url = "http://localhost:8081/api/posts";
-
-        // if we are updating a post, change the request and the url
-        if(postId > 0) {
-            request.method = "PUT";
-            url += `/${postId}`;
-        }
-
-        fetch(url, request)
-            .then(function(response) {
-                // TODO: check the status code
-                CreateView("/posts");
-            })
+        savePost(postId);
     });
+}
+
+function savePost(postId) {
+    // get the title and content for the new/updated post
+    const titleField = document.querySelector("#title");
+    const contentField = document.querySelector("#content");
+
+    // make the new/updated post object
+    const post = {
+        title: titleField.value,
+        content: contentField.value
+    }
+
+    // make the request
+    const request = {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(post)
+    }
+    let url = POST_API_BASE_URL;
+
+    // if we are updating a post, change the request and the url
+    if(postId > 0) {
+        request.method = "PUT";
+        url += `/${postId}`;
+    }
+
+    fetch(url, request)
+        .then(function(response) {
+            if(response.status !== 200) {
+                console.log("fetch returned bad status code: " + response.status);
+                console.log(response.statusText);
+                return;
+            }
+            CreateView("/posts");
+        })
 }

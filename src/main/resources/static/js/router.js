@@ -36,7 +36,6 @@ export default function router(URI) {
             title: 'Register',
             viewEvent: RegisterEvent
         },
-
         '/me': {
             returnView: prepareUserHTML,
             state: {
