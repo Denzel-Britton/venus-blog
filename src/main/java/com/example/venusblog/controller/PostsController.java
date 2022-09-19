@@ -3,11 +3,13 @@ package com.example.venusblog.controller;
 import com.example.venusblog.data.Category;
 import com.example.venusblog.data.Post;
 import com.example.venusblog.data.User;
+import com.example.venusblog.repository.CategoriesRepository;
+import com.example.venusblog.repository.PostsRepository;
 import com.example.venusblog.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import com.example.venusblog.repository.PostsRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +17,13 @@ import java.util.Optional;
 @RestController
 @RequestMapping(value = "/api/posts", produces = "application/json")
 public class PostsController {
+
+
     private PostsRepository postsRepository;
     private UsersRepository usersRepository;
+    private CategoriesRepository categoriesRepository;
 
+    private EmailService emailService;
 
     @GetMapping("")
     public List<Post> fetchPosts() {
@@ -35,7 +41,12 @@ public class PostsController {
         // use a fake author for the post
         User author = usersRepository.findById(1L).get();
         newPost.setAuthor(author);
-//       -------------------------------------
+
+        Category cat1 = categoriesRepository.findById(1L).get();
+        Category cat2 = categoriesRepository.findById(2L).get();
+        newPost.setCategories(new ArrayList<>());
+        newPost.getCategories().add(cat1);
+        newPost.getCategories().add(cat2);
 //
 //        // make some fake categories and throw them in the new post
 //        Category cat1 = new Category(1L, "bunnies", null);
@@ -45,6 +56,8 @@ public class PostsController {
 //        newPost.getCategories().add(cat2);
 
         postsRepository.save(newPost);
+
+        emailService.prepareAndSend(newPost, "you have a new post ", "the body");
     }
 
     @DeleteMapping("/{id}")
@@ -60,7 +73,7 @@ public class PostsController {
         // with the path variable id
         updatedPost.setId(id);
         postsRepository.save(updatedPost);
-
+//------------------------------------------------------------------------------------------------------------
 //        // find the post to update in the posts list
 //
 //        Post post = findPostById(id);
@@ -77,4 +90,6 @@ public class PostsController {
 //        }
 //        throw new RuntimeException("Post not found");
     }
+
+
 }

@@ -1,29 +1,26 @@
 package com.example.venusblog.controller;
 
 import com.example.venusblog.data.Category;
-import com.example.venusblog.data.Post;
+import com.example.venusblog.repository.CategoriesRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping(value = "/api/categories", produces = "application/json")
 public class CategoriesController {
+    private CategoriesRepository categoriesRepository;
 
     @GetMapping("")
-    private Category fetchPostsByCategory(@RequestParam String categoryName) {
-        Category category = new Category(1L, categoryName, null);
+    private List<Category> fetchPostsByCategory(@RequestParam String categoryName) {
 
-        ArrayList<Post> fakePosts = new ArrayList<>();
-        fakePosts.add(new Post(1L, "Bunnies Rock!", "for real!", null, new ArrayList<>(Arrays.asList(new Category(1L, categoryName, null)))));
-        fakePosts.add(new Post(2L, "Get a life", "for really real", null, new ArrayList<>(Arrays.asList(new Category(1L, categoryName, null)))));
-        category.setPosts(fakePosts);
 
-        return category;
+        return categoriesRepository.findAll();
     }
-//-------------------------------------------------------------------------
+
 }
