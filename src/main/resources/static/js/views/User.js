@@ -6,12 +6,14 @@ export default function prepareUserHTML(props) {
 
     const userPostHTML = createPostHTML(me);
 
+    console.log(me);
+
     // make the user's original pw available somewhere in here
     return `
         <h1>User Info</h1>
         <h2>${props.me.userName}</h2>
         <h2>${props.me.email}</h2>
-        
+        <img alt="my photo" src="${props.me.photoUrl}">
         <form>
             <label for="oldpassword">Please enter your current password</label>
             <input type="password" id="oldpassword" name="oldpassword">
@@ -46,12 +48,14 @@ function createPostHTML(user) {
     `;
 
     // add a row to the table for each user post
-    for (let i = 0; i < user.posts.length; i++) {
-        const post = user.posts[i];
-        html += `<tr>
-            <td>${post.title}</td>
-            <td>${post.content}</td>
-            </tr>`;
+    if(user.posts) {
+        for (let i = 0; i < user.posts.length; i++) {
+            const post = user.posts[i];
+            html += `<tr>
+                <td>${post.title}</td>
+                <td>${post.content}</td>
+                </tr>`;
+        }
     }
 
     // finish the table
